@@ -1,53 +1,61 @@
-import { useState } from "react";
-
 export default function Home() {
-  const [file, setFile] = useState(null);
-  const [newName, setNewName] = useState("");
-
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
-
-  const handleSubmit = async () => {
-    if (!file || !newName) {
-      alert("Pilih file dan masukkan nama baru!");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("newName", newName);
-
-    const res = await fetch("/api/rename", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (res.ok) {
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = newName + ".pdf";
-      a.click();
-    } else {
-      alert("Gagal rename file.");
-    }
-  };
-
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>Rename PDF Online</h1>
-      <input type="file" accept="application/pdf" onChange={handleFileChange} />
-      <br />
-      <input
-        type="text"
-        placeholder="Nama Baru"
-        value={newName}
-        onChange={(e) => setNewName(e.target.value)}
-      />
-      <br />
-      <button onClick={handleSubmit}>Rename & Download</button>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-md space-y-6">
+        <h1 className="text-2xl font-bold text-center">Rename / Edit PDF</h1>
+
+        <form
+          method="POST"
+          action="/api/upload"
+          encType="multipart/form-data"
+          className="space-y-4"
+        >
+          {/* Upload PDF */}
+          <input
+            type="file"
+            name="pdf"
+            accept="application/pdf"
+            required
+            className="block w-full border p-2 rounded"
+          />
+
+          {/* Upload Image (opsional) */}
+          <input
+            type="file"
+            name="image"
+            accept="image/*"
+            className="block w-full border p-2 rounded"
+          />
+
+          {/* Input Nama Baru */}
+          <input
+            type="text"
+            name="newName"
+            placeholder="Nama baru (tanpa .pdf)"
+            className="block w-full border p-2 rounded"
+          />
+
+          {/* Mode pilihan */}
+          <div className="space-y-2">
+            <label className="flex items-center space-x-2">
+              <input type="radio" name="mode" value="rename" defaultChecked />
+              <span>Rename PDF</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input type="radio" name="mode" value="addImage" />
+              <span>Tambahkan Foto ke PDF</span>
+            </label>
+          </div>
+
+          {/* Tombol Submit */}
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded w-full"
+          >
+            Proses
+          </button>
+        </form>
+      </div>
     </div>
-  );
+  )
 }
